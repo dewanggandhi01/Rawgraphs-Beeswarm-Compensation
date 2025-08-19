@@ -1,12 +1,8 @@
 """
 Employee Department Visualization
-- Loads a dataset (uses employees.csv if present; otherwise generates a synthetic one)
-- Prints frequency count for "Operations" to the console
-- Creates a matplotlib bar chart of department distribution
-- Saves a self-contained HTML file with the printed count and embedded chart
-
-Verification email (required in conversation & code): 23f2004781@ds.study.iitm.ac.in
+Verification email: 23f2004781@ds.study.iitm.ac.in
 """
+
 import os
 import io
 import base64
@@ -42,7 +38,7 @@ def main():
 
     counts = df["Department"].value_counts().sort_index()
 
-    # Build bar chart with matplotlib (no seaborn, no custom colors)
+    # Build bar chart
     plt.figure(figsize=(8, 5))
     plt.bar(counts.index, counts.values)
     plt.title("Department Distribution (Count)")
@@ -57,6 +53,10 @@ def main():
     buf.seek(0)
     png_b64 = base64.b64encode(buf.read()).decode("utf-8")
 
+    # Read our own source code to embed in HTML
+    with open(__file__, "r", encoding="utf-8") as f:
+        source_code = f.read()
+
     email = "23f2004781@ds.study.iitm.ac.in"
     html = f"""<!doctype html>
 <html lang="en">
@@ -65,39 +65,23 @@ def main():
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Employee Department Distribution</title>
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
-    header { margin-bottom: 1rem; }
-    h1 { font-size: 1.6rem; margin: 0 0 .25rem 0; }
-    .meta { color: #444; font-size: .95rem; }
-    figure { margin: 1.5rem 0; }
-    figcaption { color: #444; font-size: .95rem; }
-    pre { background: #f5f5f5; padding: .75rem; border-radius: 6px; overflow-x: auto; }
-    footer { margin-top: 2rem; color: #555; font-size: .9rem; }
-    code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    body {{ font-family: Arial, sans-serif; max-width: 900px; margin: 2rem auto; }}
+    pre {{ background: #f5f5f5; padding: .75rem; border-radius: 6px; overflow-x: auto; }}
+    img {{ max-width: 100%; height: auto; }}
   </style>
 </head>
 <body>
-  <header>
-    <h1>Employee Department Distribution</h1>
-    <div class="meta">Verification email: <code>{email}</code></div>
-  </header>
+  <h1>Employee Department Distribution</h1>
+  <p><b>Verification email:</b> {email}</p>
 
-  <section>
-    <h2>Operations Department Count</h2>
-    <pre>Operations department count: {operations_count}</pre>
-  </section>
+  <h2>Operations Department Count</h2>
+  <pre>Operations department count: {operations_count}</pre>
 
-  <section>
-    <h2>Histogram of Departments</h2>
-    <figure>
-      <img alt="Department distribution chart" src="data:image/png;base64,{png_b64}" />
-      <figcaption>Counts of employees per department (generated with matplotlib).</figcaption>
-    </figure>
-  </section>
+  <h2>Histogram of Departments</h2>
+  <img src="data:image/png;base64,{png_b64}" alt="Department distribution chart" />
 
-  <footer>
-    <p>This HTML file is self-contained. You can upload it to a GitHub repository and share its Raw URL.</p>
-  </footer>
+  <h2>Python Code</h2>
+  <pre><code>{source_code}</code></pre>
 </body>
 </html>"""
 
